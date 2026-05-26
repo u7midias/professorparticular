@@ -1,0 +1,794 @@
+  <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agende sua Aula — Studio Piano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0f2240;
+    --navy-mid: #1a3560;
+    --navy-light: #2a4a7f;
+    --navy-pale: #e8edf5;
+    --brown: #c4a882;
+    --brown-dark: #9e7d55;
+    --brown-light: #f5ede0;
+    --brown-pale: #faf6f0;
+    --white: #ffffff;
+    --text-main: #0f2240;
+    --text-muted: #5a6a80;
+    --text-light: #8fa0b8;
+    --border: #d8e1ed;
+    --success: #2d7a4f;
+    --success-bg: #e8f5ee;
+  }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    background: var(--brown-pale);
+    color: var(--text-main);
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--navy);
+    padding: 60px 40px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 50px,
+      rgba(196,168,130,0.04) 50px,
+      rgba(196,168,130,0.04) 51px
+    );
+  }
+  .hero-icon { font-size: 48px; display: block; margin-bottom: 20px; position: relative; z-index: 1; }
+  .hero h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.15;
+    position: relative;
+    z-index: 1;
+  }
+  .hero h1 span { color: var(--brown); }
+  .hero p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.72);
+    margin-top: 12px;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* STEPS */
+  .steps-bar {
+  position: relative;
+  z-index: 20;
+    background: var(--navy-mid);
+    padding: 0 40px;
+    display: flex;
+    justify-content: center;
+  }
+  .steps-inner {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    max-width: 600px;
+    width: 100%;
+  }
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    position: relative;
+    flex: 1;
+    justify-content: center;
+  }
+  .step-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 2px solid rgba(196,168,130,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(196,168,130,0.5);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .step-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.55);
+    transition: all 0.3s;
+  }
+  .step-item.active .step-num { border-color: var(--brown); color: var(--navy); background: var(--brown); }
+  .step-item.active .step-label { color: var(--white); }
+  .step-item.done .step-num { border-color: var(--brown); color: var(--brown); }
+  .step-item.done .step-label { color: var(--brown); }
+  .step-sep { width: 30px; height: 1px; background: rgba(196,168,130,0.2); flex-shrink: 0; }
+
+  /* MAIN */
+  main {
+    max-width: 700px;
+    margin: 0 auto 60px;
+    padding: 40px 24px 0;
+    position: relative;
+    z-index: 10;
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 36px;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+    box-shadow: 0 4px 30px rgba(15,34,64,0.07);
+  }
+  .card-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 22px;
+  }
+
+  /* CALENDÁRIO */
+  .calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .cal-month {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--navy);
+  }
+  .cal-btn {
+    width: 36px; height: 36px;
+    background: var(--navy-pale);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .cal-btn:hover { background: var(--navy); color: var(--white); }
+  .calendar-grid {
+    font-family: 'Montserrat', sans-serif;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    text-align: center;
+  }
+  .cal-weekday {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding: 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    font-weight: 700;
+    cursor: default;
+    color: var(--text-light);
+    position: relative;
+    transition: all 0.15s;
+  }
+  .cal-day.available {
+    color: var(--text-main);
+    cursor: pointer;
+    background: var(--brown-pale);
+    border: 1.5px solid var(--border);
+  }
+  .cal-day.available:hover { background: var(--navy-pale); border-color: var(--navy); }
+  .cal-day.available::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--brown);
+  }
+  .cal-day.today {
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .cal-day.selected {
+    background: var(--navy) !important;
+    border-color: var(--navy) !important;
+    color: var(--white) !important;
+    font-weight: 500;
+  }
+  .cal-day.selected::after { background: var(--brown-light); }
+
+  /* HORÁRIOS */
+  .hours-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .hour-btn {
+    padding: 14px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: var(--brown-pale);
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .hour-btn:hover { border-color: var(--navy); background: var(--navy-pale); }
+  .hour-btn.selected {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  /* FORM */
+  .form-group { margin-bottom: 20px; }
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    color: var(--text-main);
+    background: var(--brown-pale);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus { border-color: var(--navy-light); background: var(--white); }
+  .form-group input::placeholder { color: var(--text-light); }
+
+  /* RESUMO */
+  .resumo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .resumo-item:last-child { border-bottom: none; }
+  .resumo-label { font-size: 13px; color: var(--text-muted); }
+  .resumo-value { font-size: 15px; font-weight: 500; color: var(--navy); }
+
+  /* BOTÕES NAV */
+  .nav-btns {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .btn-back {
+    flex: 1;
+    padding: 14px;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+  .btn-back:hover { border-color: var(--navy); color: var(--navy); }
+  .btn-next {
+    flex: 2;
+    padding: 14px;
+    background: var(--navy);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--white);
+    transition: background 0.2s;
+  }
+  .btn-next:hover { background: var(--navy-light); }
+  .btn-next:disabled { background: var(--text-light); cursor: not-allowed; }
+
+  /* SUCESSO */
+  .success-screen {
+    text-align: center;
+    padding: 20px 0 10px;
+  }
+  .success-icon {
+    width: 80px; height: 80px;
+    background: var(--success-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 24px;
+  }
+  .success-screen h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 10px;
+  }
+  .success-screen p {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    font-weight: 300;
+    max-width: 360px;
+    margin: 0 auto 28px;
+  }
+  .success-box {
+    background: var(--navy-pale);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    text-align: left;
+  }
+  .btn-novo {
+    padding: 14px 36px;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-novo:hover { background: var(--navy-light); }
+
+  .no-slots-msg {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 15px;
+    padding: 30px 0 10px;
+  }
+  .no-slots-msg span { font-size: 28px; display: block; margin-bottom: 12px; }
+
+  .validation-msg {
+    background: #faeaea;
+    color: #b03030;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 40px 20px 70px; }
+    .hero h1 { font-size: 28px; }
+    .card { padding: 24px 20px; }
+    .hours-grid { grid-template-columns: repeat(2, 1fr); }
+    .step-label { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="hero-icon">🎹</span>
+  <h1>Agende sua <span>Aula de Piano</span></h1>
+  <p>Escolha a data e o horário que funciona melhor para você</p>
+</div>
+
+<div class="steps-bar">
+  <div class="steps-inner">
+    <div class="step-item active" id="step-1">
+      <div class="step-num">1</div>
+      <span class="step-label">Data</span>
+    </div>
+    <div class="step-sep"></div>
+    <div class="step-item" id="step-2">
+      <div class="step-num">2</div>
+      <span class="step-label">Horário</span>
+    </div>
+    <div class="step-sep"></div>
+    <div class="step-item" id="step-3">
+      <div class="step-num">3</div>
+      <span class="step-label">Seus dados</span>
+    </div>
+    <div class="step-sep"></div>
+    <div class="step-item" id="step-4">
+      <div class="step-num">4</div>
+      <span class="step-label">Confirmação</span>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- PASSO 1: Data -->
+  <div id="passo-1">
+    <div class="card">
+      <div class="card-title">Escolha a data</div>
+      <div class="calendar-nav">
+        <button class="cal-btn" onclick="changeMonth(-1)">‹</button>
+        <span class="cal-month" id="cal-month-label"></span>
+        <button class="cal-btn" onclick="changeMonth(1)">›</button>
+      </div>
+      <div class="calendar-grid" id="cal-grid">
+        <div class="cal-weekday">Dom</div>
+        <div class="cal-weekday">Seg</div>
+        <div class="cal-weekday">Ter</div>
+        <div class="cal-weekday">Qua</div>
+        <div class="cal-weekday">Qui</div>
+        <div class="cal-weekday">Sex</div>
+        <div class="cal-weekday">Sáb</div>
+      </div>
+      <div class="validation-msg" id="val-1">Por favor, selecione uma data disponível.</div>
+    </div>
+    <div class="nav-btns" style="justify-content: flex-end;">
+      <button class="btn-next" style="flex:1; max-width:200px;" onclick="goTo(2)">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- PASSO 2: Horário -->
+  <div id="passo-2" style="display:none;">
+    <div class="card">
+      <div class="card-title" id="passo2-label">Horários disponíveis</div>
+      <div class="hours-grid" id="hours-grid"></div>
+      <div class="validation-msg" id="val-2">Por favor, selecione um horário.</div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goTo(1)">← Voltar</button>
+      <button class="btn-next" onclick="goTo(3)">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- PASSO 3: Dados -->
+  <div id="passo-3" style="display:none;">
+    <div class="card">
+      <div class="card-title">Seus dados</div>
+      <div class="form-group">
+        <label>Nome completo</label>
+        <input type="text" id="inp-nome" placeholder="Ex: Ana Clara Santos">
+      </div>
+      <div class="form-group">
+        <label>WhatsApp / Telefone</label>
+        <input type="tel" id="inp-tel" placeholder="(11) 99999-9999">
+      </div>
+      <div class="validation-msg" id="val-3">Por favor, preencha nome e telefone.</div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goTo(2)">← Voltar</button>
+      <button class="btn-next" onclick="goTo(4)">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- PASSO 4: Confirmação -->
+  <div id="passo-4" style="display:none;">
+    <div class="card">
+      <div class="card-title">Confirme seu agendamento</div>
+      <div id="resumo-items"></div>
+      <div class="validation-msg" id="val-4"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goTo(3)">← Voltar</button>
+      <button class="btn-next" onclick="confirmar()">✓ Confirmar Agendamento</button>
+    </div>
+  </div>
+
+  <!-- SUCESSO -->
+  <div id="passo-sucesso" style="display:none;">
+    <div class="card">
+      <div class="success-screen">
+        <div class="success-icon">✓</div>
+        <h2>Agendamento Realizado!</h2>
+        <p>Sua aula foi agendada com sucesso. Aguarde a confirmação do professor pelo WhatsApp.</p>
+        <div class="success-box" id="success-details"></div>
+        <button class="btn-novo" onclick="novoAgendamento()">Fazer outro agendamento</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── DADOS ─────────────────────────────────────────────────────────────────
+function getData(k, def) { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } }
+function setData(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+function getSlots() { return getData('piano_slots', {}); }
+function getAppts() { return getData('piano_appts', []); }
+function saveAppts(a) { setData('piano_appts', a); }
+
+// ── ESTADO ────────────────────────────────────────────────────────────────
+let curYear, curMonth, selData = null, selHora = null;
+
+window.onload = () => {
+  const today = new Date();
+  curYear = today.getFullYear();
+  curMonth = today.getMonth();
+  renderCalendar();
+};
+
+// ── CALENDÁRIO ────────────────────────────────────────────────────────────
+function changeMonth(d) {
+  curMonth += d;
+  if (curMonth > 11) { curMonth = 0; curYear++; }
+  if (curMonth < 0)  { curMonth = 11; curYear--; }
+  selData = null;
+  renderCalendar();
+}
+
+function dateKey(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function renderCalendar() {
+  const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('cal-month-label').textContent = months[curMonth] + ' ' + curYear;
+
+  const grid = document.getElementById('cal-grid');
+  const weekdays = [...grid.querySelectorAll('.cal-weekday')];
+  grid.innerHTML = '';
+  weekdays.forEach(w => grid.appendChild(w));
+
+  const slots = getSlots();
+  const appts = getAppts();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const firstDay = new Date(curYear, curMonth, 1).getDay();
+  const daysInMonth = new Date(curYear, curMonth+1, 0).getDate();
+
+  for (let i = 0; i < firstDay; i++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    grid.appendChild(el);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(curYear, curMonth, d);
+    const key = dateKey(date);
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    el.textContent = d;
+
+    // verificar se há slots livres (não agendados)
+    const daySlots = slots[key] || {};
+    const bookedHours = appts.filter(a => a.data === key).map(a => a.hora);
+    const freeCount = Object.keys(daySlots).filter(h => !bookedHours.includes(h)).length;
+
+    if (date >= today && freeCount > 0) {
+      el.classList.add('available');
+      if (date.toDateString() === today.toDateString()) el.classList.add('today');
+      if (selData === key) el.classList.add('selected');
+      el.onclick = () => selectDate(key, el);
+    } else if (date.toDateString() === today.toDateString()) {
+      el.classList.add('today');
+    }
+    grid.appendChild(el);
+  }
+}
+
+function selectDate(key, el) {
+  document.querySelectorAll('.cal-day.selected').forEach(d => d.classList.remove('selected'));
+  el.classList.add('selected');
+  selData = key;
+  selHora = null;
+}
+
+// ── NAVEGAÇÃO ─────────────────────────────────────────────────────────────
+function goTo(passo) {
+  // validações
+  if (passo === 2) {
+    if (!selData) { showVal('val-1'); return; }
+    hideVal('val-1');
+    renderHours();
+  }
+  if (passo === 3) {
+    if (!selHora) { showVal('val-2'); return; }
+    hideVal('val-2');
+  }
+  if (passo === 4) {
+    const nome = document.getElementById('inp-nome').value.trim();
+    const tel  = document.getElementById('inp-tel').value.trim();
+    if (!nome || !tel) { showVal('val-3'); return; }
+    hideVal('val-3');
+    renderResumo();
+  }
+
+  // esconder tudo
+  [1,2,3,4,'sucesso'].forEach(p => {
+    const el = document.getElementById('passo-' + p);
+    if (el) el.style.display = 'none';
+  });
+  document.getElementById('passo-' + passo).style.display = 'block';
+  updateSteps(typeof passo === 'number' ? passo : 5);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateSteps(active) {
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('step-' + i);
+    el.classList.remove('active', 'done');
+    if (i < active) el.classList.add('done');
+    else if (i === active) el.classList.add('active');
+  }
+}
+
+function showVal(id) {
+  const el = document.getElementById(id);
+  if (el) { el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 3000); }
+}
+function hideVal(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'none';
+}
+
+// ── HORÁRIOS ──────────────────────────────────────────────────────────────
+function renderHours() {
+  const slots = getSlots();
+  const appts = getAppts();
+  const daySlots = slots[selData] || {};
+  const bookedHours = appts.filter(a => a.data === selData).map(a => a.hora);
+  const freeHours = Object.keys(daySlots).filter(h => !bookedHours.includes(h)).sort();
+
+  const [y, m, d] = selData.split('-');
+  const months = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  document.getElementById('passo2-label').textContent = `Horários — ${d} de ${months[parseInt(m)-1]}`;
+
+  const grid = document.getElementById('hours-grid');
+  if (!freeHours.length) {
+    grid.innerHTML = '<div class="no-slots-msg" style="grid-column:1/-1"><span>😔</span>Sem horários disponíveis nesta data.<br>Escolha outra data.</div>';
+    return;
+  }
+
+  grid.innerHTML = freeHours.map(h => `
+    <button class="hour-btn ${selHora === h ? 'selected' : ''}" onclick="selectHour(this, '${h}')">${h}</button>
+  `).join('');
+}
+
+function selectHour(el, hora) {
+  document.querySelectorAll('.hour-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selHora = hora;
+}
+
+// ── RESUMO ────────────────────────────────────────────────────────────────
+function renderResumo() {
+  const [y,m,d] = selData.split('-');
+  const weekDays = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const dateObj = new Date(parseInt(y), parseInt(m)-1, parseInt(d));
+  const nome = document.getElementById('inp-nome').value.trim();
+  const tel = document.getElementById('inp-tel').value.trim();
+
+  document.getElementById('resumo-items').innerHTML = `
+    <div class="resumo-item">
+      <span class="resumo-label">Aluno</span>
+      <span class="resumo-value">${nome}</span>
+    </div>
+    <div class="resumo-item">
+      <span class="resumo-label">WhatsApp</span>
+      <span class="resumo-value">${tel}</span>
+    </div>
+    <div class="resumo-item">
+      <span class="resumo-label">Data</span>
+      <span class="resumo-value">${weekDays[dateObj.getDay()]}, ${d} de ${months[parseInt(m)-1]} de ${y}</span>
+    </div>
+    <div class="resumo-item">
+      <span class="resumo-label">Horário</span>
+      <span class="resumo-value">🕐 ${selHora}</span>
+    </div>
+    <div class="resumo-item" style="border:none; padding-bottom:0;">
+      <span class="resumo-label">Status</span>
+      <span style="background:var(--brown-light);color:var(--brown-dark);padding:4px 14px;border-radius:20px;font-size:13px;font-weight:500;">Aguardando confirmação</span>
+    </div>
+  `;
+}
+
+// ── CONFIRMAR ─────────────────────────────────────────────────────────────
+function confirmar() {
+  const nome = document.getElementById('inp-nome').value.trim();
+  const tel  = document.getElementById('inp-tel').value.trim();
+
+  // checar se slot ainda está livre (outra aba pode ter agendado)
+  const slots = getSlots();
+  const appts = getAppts();
+  const daySlots = slots[selData] || {};
+  const isBooked = appts.some(a => a.data === selData && a.hora === selHora);
+
+  if (!daySlots[selHora] || isBooked) {
+    document.getElementById('val-4').textContent = 'Este horário acabou de ser reservado por outro aluno. Volte e escolha outro.';
+    document.getElementById('val-4').style.display = 'block';
+    return;
+  }
+
+  const id = 'appt_' + Date.now();
+  const newAppt = { id, data: selData, hora: selHora, nome, telefone: tel, status: 'pendente' };
+  const allAppts = [...appts, newAppt];
+  saveAppts(allAppts);
+
+  // mostrar sucesso
+  const [y,m,d] = selData.split('-');
+  const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  document.getElementById('success-details').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;justify-content:space-between;">
+        <span style="font-size:13px;color:var(--text-muted);">Aluno</span>
+        <span style="font-size:14px;font-weight:500;color:var(--navy);">${nome}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="font-size:13px;color:var(--text-muted);">Data</span>
+        <span style="font-size:14px;font-weight:500;color:var(--navy);">${d} de ${months[parseInt(m)-1]} de ${y}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="font-size:13px;color:var(--text-muted);">Horário</span>
+        <span style="font-size:14px;font-weight:500;color:var(--navy);">${selHora}</span>
+      </div>
+    </div>
+  `;
+
+  [1,2,3,4].forEach(p => { const el = document.getElementById('passo-' + p); if (el) el.style.display = 'none'; });
+  document.getElementById('passo-sucesso').style.display = 'block';
+  updateSteps(5);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function novoAgendamento() {
+  selData = null; selHora = null;
+  document.getElementById('inp-nome').value = '';
+  document.getElementById('inp-tel').value = '';
+  const today = new Date();
+  curYear = today.getFullYear();
+  curMonth = today.getMonth();
+  document.getElementById('passo-sucesso').style.display = 'none';
+  document.getElementById('passo-1').style.display = 'block';
+  updateSteps(1);
+  renderCalendar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
